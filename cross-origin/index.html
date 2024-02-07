@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iframe Window</title>
+</head>
+<body>
+    <script>
+        // Listen for messages from the parent window
+        window.addEventListener('message', (event) => {
+            const data=JSON.parse(event.data);
+            if (data.namespace === 'cross-domain-local-message' && data.action === 'set') {
+                // Parse the received data
+                const receivedData = JSON.parse(data.value);
+                // Set the received data in local storage
+                localStorage.setItem(data.key, data.value);
+                console.log(`Data set in local storage: ${receivedData.key} = ${receivedData.value}`);
+            }
+
+            if (data.namespace === 'cross-domain-local-message' && data.action === 'get') {
+                // // Parse the received data
+                const widgetData=localStorage.getItem(data.key);
+                const dataObj = { namespace: data.namespace, id: data.id, value: widgetData };
+                event.source.postMessage(JSON.stringify(dataObj), event.origin);
+            }
+        });
+    </script>
+</body>
+</html>
